@@ -46,11 +46,55 @@ public class Main extends javax.swing.JFrame {
     public int ItemCount = 0;
     public String[] Purchases;
     public String ItemList;
+    Thread Timeout = null;
 
     public Main(String key) {
         PMKey = key;
         initComponents();
         SQLSetup();
+        StartTimeout();
+    }
+
+    private void StartTimeout() {
+        Timeout = null;
+        Timeout = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000 * 5);
+                    PurchaseActionPerformed(null);
+                    Timeout.join();
+                } catch (InterruptedException | NullPointerException e) {
+                }
+            }
+        };
+        Timeout.start();
+    }
+
+    private void endTimeout() {
+        Timeout.interrupt();
+        try {
+            Timeout.join();
+        } catch (InterruptedException ex) {
+        }
+    }
+
+    private void KillScreen() {
+        Timeout = null;
+        PMKey = null;
+        Name = null;
+        User = null;
+        StockState = 0;
+        RunningCost = 0;
+        sql = null;
+        cart = null;
+        Stock = null;
+        PurchaseList = null;
+        Price = 0;
+        ItemCount = 0;
+        Purchases = null;
+        ItemList = null;
+        System.gc();
     }
 
     private void SQLSetup() {
@@ -304,16 +348,15 @@ public class Main extends javax.swing.JFrame {
         try {
             String line = CartWin.getSelectedValue().toString();
             String ItemName = line.substring(line.indexOf(" ") + 3, line.indexOf('$') - 4);
-            System.out.println(ItemName);
             cart.add("-" + ItemName);
             CartUpdate();
-            
-            if (RunningCost == 0)
+
+            if (RunningCost == 0) {
                 Purchase.setText("Exit Purchase Screen");
+            }
         } catch (Exception ex) {
             error(Name + ":" + PMKey, "Exception Caught in RemoveActionPerformed");
         }
-
     }//GEN-LAST:event_RemoveActionPerformed
 
     private void KeyInFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_KeyInFocusLost
@@ -322,12 +365,14 @@ public class Main extends javax.swing.JFrame {
 
     private void KeyInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KeyInActionPerformed
         try {
-            if (RunningCost == 0)
-                Purchase.setText("Purchase Cart");
+
             String[][] Prod = sql.SQLSend("SELECT Name, Cost FROM Products where Barcode='" + KeyIn.getText() + "'", 2);
             cart.add(Prod[0][0]);
             CartUpdate();
             CartWin.ensureIndexIsVisible(lm.getSize() - 1);
+            if (RunningCost > 0) {
+                Purchase.setText("Purchase Cart");
+            }
         } catch (Exception ex) {
             error(Name + ":" + PMKey, "Exception Caught in KeyInActionPerformed");
         } finally {
@@ -338,11 +383,10 @@ public class Main extends javax.swing.JFrame {
 
     private void PurchaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PurchaseActionPerformed
         try {
-
-            if (lm.isEmpty() || (lm.getSize() == 0)){
+            if (lm.isEmpty() || (lm.getSize() == 0)) {
                 ItemList = "";
                 return;
-            } 
+            }
 
             PurchaseSort(User[4][0]);
 
@@ -377,9 +421,10 @@ public class Main extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "The stock of " + ex.getMessage() + " is not great enough to allow this purchase.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed");
-            System.out.println(ex);
             JOptionPane.showMessageDialog(null, "There was an error with the purchase - Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } finally {
+            endTimeout();
+            KillScreen();
             Login l = new Login();
             l.setVisible(true);
             l.pack();
@@ -428,9 +473,12 @@ public class Main extends javax.swing.JFrame {
         Price = 0;
         ItemCount = 0;
 
+        endTimeout();
+
+        StartTimeout();
     }
 
-    public void PurchaseSort(String list) {
+    private void PurchaseSort(String list) {
         Purchases = list.split(",");
         for (String item : Purchases) {
             String[] temp = item.split(":");
@@ -439,7 +487,7 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    public void PurchaseAdd(String name, int lots) {
+    private void PurchaseAdd(String name, int lots) {
         for (int i = 0; i < PurchaseList.size() - 1; i += 2) {
             int index = PurchaseList.indexOf(name);
             if (index != -1) {
@@ -452,7 +500,7 @@ public class Main extends javax.swing.JFrame {
         PurchaseList.add(lots);
     }
 
-    public void PurchaseSend() {
+    private void PurchaseSend() {
         for (int i = 0; i < PurchaseList.size() - 1; i += 2) {
             ItemList += ("," + PurchaseList.get(i) + ":" + PurchaseList.get(i + 1));
         }

@@ -32,7 +32,7 @@ import java.sql.SQLException;
 
 public class SQLInterface {
 
-    public String url = "jdbc:mysql://localhost:3306/14TOC";
+    public String url = "jdbc:mysql://192.168.0.2:3306/14TOC";
     public String user = "root";
     public String password = "";
     public Connection con = null;
