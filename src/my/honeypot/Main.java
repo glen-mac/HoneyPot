@@ -54,7 +54,7 @@ public class Main extends javax.swing.JFrame {
         StartTimeout();
         SQLSetup();
     }
-//commentt
+
     private void StartTimeout() {
         Timeout = null;
         Timeout = new Thread() {
@@ -420,9 +420,9 @@ public class Main extends javax.swing.JFrame {
         } catch (NullPointerException ex) {
             error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed - Negative Stock Purchase");
             JOptionPane.showMessageDialog(null, "The stock of " + ex.getMessage() + " is not great enough to allow this purchase.", "ERROR", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed");
-            JOptionPane.showMessageDialog(null, "There was an error with the purchase - Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
+            //  } catch (Exception ex) {
+            // error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed");
+            // JOptionPane.showMessageDialog(null, "There was an error with the purchase - Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } finally {
             endTimeout();
             KillScreen();
@@ -480,11 +480,13 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void PurchaseSort(String list) {
-        Purchases = list.split(",");
-        for (String item : Purchases) {
-            String[] temp = item.split(":");
-            PurchaseList.add(temp[0]);
-            PurchaseList.add(temp[1]);
+        if (list.length() > 0) {
+            Purchases = list.split(",");
+            for (String item : Purchases) {
+                String[] temp = item.split(":");
+                PurchaseList.add(temp[0]);
+                PurchaseList.add(temp[1]);
+            }
         }
     }
 
