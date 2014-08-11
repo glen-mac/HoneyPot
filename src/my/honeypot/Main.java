@@ -33,26 +33,26 @@ import javax.swing.JOptionPane;
 
 public class Main extends javax.swing.JFrame {
 
-    public String PMKey;
-    public String Name = null;
-    public String[][] User = null;
-    public int StockState;
-    public double RunningCost = 0.00;
-    SQLInterface sql = new SQLInterface();
-    ArrayList<String> cart = new ArrayList();
-    public List Stock = new ArrayList();
-    public List PurchaseList = new ArrayList();
-    public double Price;
-    public int ItemCount = 0;
-    public String[] Purchases;
-    public String ItemList;
-    Thread Timeout = null;
+    private String PMKey;
+    private String Name = null;
+    private String[][] User = null;
+    private int StockState;
+    private double RunningCost = 0.00;
+    private SQLInterface sql = new SQLInterface();
+    private ArrayList<String> cart = new ArrayList();
+    private List Stock = new ArrayList();
+    private List PurchaseList = new ArrayList();
+    private double Price;
+    private int ItemCount = 0;
+    private String[] Purchases;
+    private String ItemList;
+    private Thread Timeout = null;
 
     public Main(String key) {
         PMKey = key;
         initComponents();
-        SQLSetup();
         StartTimeout();
+        SQLSetup();
     }
 
     private void StartTimeout() {
@@ -61,7 +61,7 @@ public class Main extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000 * 5);
+                    Thread.sleep(1000 * 30);
                     PurchaseActionPerformed(null);
                     Timeout.join();
                 } catch (InterruptedException | NullPointerException e) {
@@ -345,9 +345,10 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void RemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveActionPerformed
+        String ItemName = "";
         try {
             String line = CartWin.getSelectedValue().toString();
-            String ItemName = line.substring(line.indexOf(" ") + 3, line.indexOf('$') - 4);
+            ItemName = line.substring(line.indexOf(" ") + 3, line.indexOf('$') - 4);
             cart.add("-" + ItemName);
             CartUpdate();
 
@@ -355,7 +356,7 @@ public class Main extends javax.swing.JFrame {
                 Purchase.setText("Exit Purchase Screen");
             }
         } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in RemoveActionPerformed");
+            error(Name + ":" + PMKey, "Exception Caught in RemoveActionPerformed: '" + ItemName + "'");
         }
     }//GEN-LAST:event_RemoveActionPerformed
 
@@ -374,7 +375,7 @@ public class Main extends javax.swing.JFrame {
                 Purchase.setText("Purchase Cart");
             }
         } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in KeyInActionPerformed");
+            error(Name + ":" + PMKey, "Exception Caught in KeyInActionPerformed: '" + KeyIn.getText() + "'");
         } finally {
             KeyIn.setText("");
         }
@@ -502,7 +503,9 @@ public class Main extends javax.swing.JFrame {
 
     private void PurchaseSend() {
         for (int i = 0; i < PurchaseList.size() - 1; i += 2) {
-            ItemList += ("," + PurchaseList.get(i) + ":" + PurchaseList.get(i + 1));
+            if (Integer.valueOf(PurchaseList.get(i + 1).toString()) != 0) {
+                ItemList += ("," + PurchaseList.get(i) + ":" + PurchaseList.get(i + 1));
+            }
         }
     }
 
