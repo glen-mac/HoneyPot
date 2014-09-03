@@ -113,10 +113,11 @@ public class Main extends javax.swing.JFrame {
 
             CartUpdate();
 
-        } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in SQLSetup");
-        }
+            Remove.setEnabled(false);
 
+        } catch (Exception ex) {
+            error(Name + ":" + PMKey, "Exception Caught in SQLSetup (Main)");
+        }
     }
 
     /**
@@ -347,6 +348,7 @@ public class Main extends javax.swing.JFrame {
     private void RemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveActionPerformed
         String ItemName = "";
         try {
+
             String line = CartWin.getSelectedValue().toString();
             ItemName = line.substring(line.indexOf(" ") + 3, line.indexOf('$') - 4);
             cart.add("-" + ItemName);
@@ -355,8 +357,13 @@ public class Main extends javax.swing.JFrame {
             if (RunningCost == 0) {
                 Purchase.setText("Exit Purchase Screen");
             }
+
+            if (Remove.isEnabled() && lm.isEmpty()) {
+                Remove.setEnabled(false);
+            }
+
         } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in RemoveActionPerformed: '" + ItemName + "'");
+            error(Name + ":" + PMKey, "Exception Caught in (Remove)ActionPerformed: '" + ItemName + "'");
         }
     }//GEN-LAST:event_RemoveActionPerformed
 
@@ -366,7 +373,6 @@ public class Main extends javax.swing.JFrame {
 
     private void KeyInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KeyInActionPerformed
         try {
-
             String[][] Prod = sql.SQLSend("SELECT Name, Cost FROM Products where Barcode='" + KeyIn.getText() + "'", 2);
             cart.add(Prod[0][0]);
             CartUpdate();
@@ -374,8 +380,13 @@ public class Main extends javax.swing.JFrame {
             if (RunningCost > 0) {
                 Purchase.setText("Purchase Cart");
             }
+
+            if (!Remove.isEnabled()) {
+                Remove.setEnabled(true);
+            }
+
         } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in KeyInActionPerformed: '" + KeyIn.getText() + "'");
+            error(Name + ":" + PMKey, "Exception Caught in (Scanning) KeyInActionPerformed: '" + KeyIn.getText() + "'");
         } finally {
             KeyIn.setText("");
         }
@@ -418,11 +429,11 @@ public class Main extends javax.swing.JFrame {
             sql.SQLUpdate("UPDATE Users SET Purchases = '" + ItemList.substring(5) + "' WHERE PMKEYS = '" + PMKey + "'");
 
         } catch (NullPointerException ex) {
-            error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed - Negative Stock Purchase");
+            error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed - Negative Stock Purchase (" + ex.getMessage() + ")");
             JOptionPane.showMessageDialog(null, "The stock of " + ex.getMessage() + " is not great enough to allow this purchase.", "ERROR", JOptionPane.ERROR_MESSAGE);
-            //  } catch (Exception ex) {
-            // error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed");
-            // JOptionPane.showMessageDialog(null, "There was an error with the purchase - Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed");
+            JOptionPane.showMessageDialog(null, "There was an error with the purchase - (?)Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } finally {
             endTimeout();
             KillScreen();

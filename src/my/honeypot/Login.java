@@ -34,10 +34,9 @@ public class Login extends javax.swing.JFrame {
     SQLInterface sql = new SQLInterface();
     String Res = null;
     String CurrTxt = null;
-    
+
     //Path currentRelativePath = Paths.get("");
     //String pathy = "/home/badger/Honeypot/audio/";
-
     public Login() {
         initComponents();
         PmkeysField.requestFocus();
@@ -251,7 +250,7 @@ public class Login extends javax.swing.JFrame {
             Res = (String) sql.SQLSend("SELECT Name FROM Users where PMKEYS='" + CurrTxt + "'", 1)[0][0];
             if (Res != null) {
 
-               // MP3 mp3 = new MP3("/home/badger/Honeypot/audio/cardScan.mp3");
+                // MP3 mp3 = new MP3("/home/badger/Honeypot/audio/cardScan.mp3");
                 // mp3.play();
                 Main w = new Main(CurrTxt);
                 w.setVisible(true);
@@ -260,7 +259,7 @@ public class Login extends javax.swing.JFrame {
 
             }
         } catch (Exception ex) {
-            error("Login:" + CurrTxt, "Exception Caught in PmkeysFieldActionPerformed");
+            error("Login:" + CurrTxt, "Exception Caught Logging in (PmkeysFieldActionPerformed)");
             Instructions.setText("User does not exist - Please try again");
             Instructions.setForeground(Color.red);
         } finally {
