@@ -1,6 +1,7 @@
 /*
  * The MIT License
  *
+ * @Version 1.1.2 
  * Copyright 2014 Glenn McGuire <glennmcguire9@gmail.com> <www.github.com/gmac>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -61,8 +62,8 @@ public class SQLInterface {
                 Counter++;
             }
 
-        } catch (SQLException sex) {
-            warn("SQLSend", "Exception Caught executing SQL statement: \n                                       " + state);
+        } catch (SQLException ex) {
+            warn("SQLSend", "Exception Caught executing SQL statement: \n                                       " + state + " || MSG: " + ex.getMessage());
         } catch (Exception ex) {
         } finally {
             try {
@@ -94,7 +95,7 @@ public class SQLInterface {
             con.createStatement().execute(state);
 
         } catch (SQLException ex) {
-            warn("SQLUpdate", "Exception Caught executing SQL statement: \n                                       " + state);
+            warn("SQLUpdate", "Exception Caught executing SQL statement: \n                                       " + state + " || MSG: " + ex.getMessage());
         } finally {
             try {
                 if (con != null) {

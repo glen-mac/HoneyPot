@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * @Version 1.1 
+ * @Version 1.1.2 
  * Copyright 2014 Glenn McGuire <glennmcguire9@gmail.com> <https://github.com/glen-mac>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -363,7 +363,11 @@ public class Main extends javax.swing.JFrame {
             }
 
         } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in (Remove)ActionPerformed: '" + ItemName + "'");
+            if (CartWin.getSelectedValue() != null) {
+                error(Name + ":" + PMKey, "Exception Caught in (RemoveItem) ActionPerformed: '" + ItemName + "'");
+            } else {
+                CartWin.setSelectedIndex(lm.getSize() - 1);
+            }
         }
     }//GEN-LAST:event_RemoveActionPerformed
 
@@ -411,7 +415,7 @@ public class Main extends javax.swing.JFrame {
                 int number = ((int) Stock.get(i + 1));
                 StockState = (int) Integer.valueOf(sql.SQLSend("SELECT Stock FROM Products WHERE Name = '" + name + "'", 1)[0][0]);
                 if (StockState - number < 0) {
-                    throw new NullPointerException(name);
+                    error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed - Negative Stock Purchase (" + name + ":" + number + ":" + (StockState - number) + ")");
                 }
                 sqlState += ("WHEN '" + name + "' THEN (Stock - " + number + ") ");
                 sqlEnd += "'" + name + "', ";
@@ -428,12 +432,12 @@ public class Main extends javax.swing.JFrame {
 
             sql.SQLUpdate("UPDATE Users SET Purchases = '" + ItemList.substring(5) + "' WHERE PMKEYS = '" + PMKey + "'");
 
-        } catch (NullPointerException ex) {
-            error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed - Negative Stock Purchase (" + ex.getMessage() + ")");
-            JOptionPane.showMessageDialog(null, "The stock of " + ex.getMessage() + " is not great enough to allow this purchase.", "ERROR", JOptionPane.ERROR_MESSAGE);
+            // } catch (NullPointerException ex) {
+            //  error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed - Negative Stock Purchase (" + ex.getMessage() + ")");
+            // JOptionPane.showMessageDialog(null, "The stock of " + ex.getMessage() + " is not great enough to allow this purchase.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            error(Name + ":" + PMKey, "Exception Caught in PurchaseActionPerformed");
-            JOptionPane.showMessageDialog(null, "There was an error with the purchase - (?)Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
+            error(Name + ":" + PMKey, "Exception Caught in (Purchasing) (?Unknown?) PurchaseActionPerformed");
+            JOptionPane.showMessageDialog(null, "There was an error with the purchase - Purchase not successfull.", "ERROR", JOptionPane.ERROR_MESSAGE);
         } finally {
             endTimeout();
             KillScreen();
@@ -522,9 +526,6 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
 
         try {
